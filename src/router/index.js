@@ -44,19 +44,19 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-  
+
   // 检查是否需要认证
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next('/login')
     return
   }
-  
+
   // 检查是否要求未登录（如登录页面）
   if (to.meta.requiresGuest && authStore.isLoggedIn) {
     next('/users')
     return
   }
-  
+
   next()
 })
 

@@ -11,8 +11,8 @@
       </div>
       
       <div class="game-area">
-        <div 
-          v-for="(step, index) in currentLocationData.steps" 
+        <div
+          v-for="(step, index) in currentLocationData.steps"
           :key="index"
           class="step-card"
           :class="{ active: currentStepIndex === index }"
@@ -29,8 +29,8 @@
           <div v-if="step.quiz && currentStepIndex === index" class="quiz-container">
             <div class="quiz-question">{{ step.quiz.question }}</div>
             <div class="quiz-options">
-              <button 
-                v-for="(option, optIndex) in step.quiz.options" 
+              <button
+                v-for="(option, optIndex) in step.quiz.options"
                 :key="optIndex"
                 class="quiz-option"
                 :class="{
@@ -56,8 +56,8 @@
       </div>
       
       <div class="controls">
-        <button 
-          @click="startLocationGame" 
+        <button
+          @click="startLocationGame"
           :disabled="isCompleted || isInProgress"
         >
           {{ startButtonText }}
@@ -77,6 +77,10 @@
         <div>{{ currentLocationData.title }} - {{ currentLocationData.subtitle }}</div>
       </footer>
     </div>
+  </div>
+  <div v-else class="loading">
+    地点不存在或加载中...
+    <button @click="goBack" class="back-btn">返回地图</button>
   </div>
 </template>
 
@@ -99,22 +103,22 @@ export default {
     const selectedOption = ref(null)
     const resultMessage = ref('任务尚未开始...')
     
-    // 地点配置
+    // 地点配置 - 修复为完整的配置对象
     const locationsConfig = {
       library: {
         title: "古老图书馆",
         subtitle: "寻找初始线索",
         steps: [
-          { 
-            title: "寻找古籍", 
-            content: "在古老的图书馆里寻找关于宝藏的第一个线索...", 
-            animation: "📚", 
-            quiz: null 
+          {
+            title: "寻找古籍",
+            content: "在古老的图书馆里寻找关于宝藏的第一个线索...",
+            animation: "📚",
+            quiz: null
           },
-          { 
-            title: "解读古籍", 
-            content: "你找到了一本古籍，但需要解开书中的谜题...", 
-            animation: "🔍", 
+          {
+            title: "解读古籍",
+            content: "你找到了一本古籍，但需要解开书中的谜题...",
+            animation: "🔍",
             quiz: {
               question: "古籍中哪个符号代表'宝藏'？",
               options: [
@@ -133,16 +137,16 @@ export default {
         title: "失落神庙",
         subtitle: "解码古代文字",
         steps: [
-          { 
-            title: "进入神庙", 
-            content: "根据线索，你来到了失落的神庙，寻找古代文字...", 
-            animation: "🏛️", 
-            quiz: null 
+          {
+            title: "进入神庙",
+            content: "根据线索，你来到了失落的神庙，寻找古代文字...",
+            animation: "🏛️",
+            quiz: null
           },
-          { 
-            title: "解读文字", 
-            content: "你发现了刻在墙上的古代文字，需要正确解读...", 
-            animation: "🔍", 
+          {
+            title: "解读文字",
+            content: "你发现了刻在墙上的古代文字，需要正确解读...",
+            animation: "🔍",
             quiz: {
               question: "古代文字中哪个图案代表'入口'？",
               options: [
@@ -161,16 +165,16 @@ export default {
         title: "神秘洞穴",
         subtitle: "避开守卫陷阱",
         steps: [
-          { 
-            title: "进入洞穴", 
-            content: "你来到了神秘洞穴，需要小心避开守卫...", 
-            animation: "🕳️", 
-            quiz: null 
+          {
+            title: "进入洞穴",
+            content: "你来到了神秘洞穴，需要小心避开守卫...",
+            animation: "🕳️",
+            quiz: null
           },
-          { 
-            title: "避开陷阱", 
-            content: "洞穴中有古老的守卫机制，需要巧妙避开...", 
-            animation: "⚔️", 
+          {
+            title: "避开陷阱",
+            content: "洞穴中有古老的守卫机制，需要巧妙避开...",
+            animation: "⚔️",
             quiz: {
               question: "如何避开洞穴中的陷阱？",
               options: [
@@ -189,16 +193,16 @@ export default {
         title: "沉船海滩",
         subtitle: "寻找藏宝图",
         steps: [
-          { 
-            title: "搜索海滩", 
-            content: "在沉船海滩上寻找可能的藏宝图...", 
-            animation: "🏖️", 
-            quiz: null 
+          {
+            title: "搜索海滩",
+            content: "在沉船海滩上寻找可能的藏宝图...",
+            animation: "🏖️",
+            quiz: null
           },
-          { 
-            title: "解读地图", 
-            content: "你找到了一张古老的地图，需要正确解读...", 
-            animation: "🗺️", 
+          {
+            title: "解读地图",
+            content: "你找到了一张古老的地图，需要正确解读...",
+            animation: "🗺️",
             quiz: {
               question: "地图上的X标记在哪里？",
               options: [
@@ -217,16 +221,16 @@ export default {
         title: "远古山脉",
         subtitle: "解读星象线索",
         steps: [
-          { 
-            title: "攀登山脉", 
-            content: "你来到了远古山脉，寻找星象线索...", 
-            animation: "⛰️", 
-            quiz: null 
+          {
+            title: "攀登山脉",
+            content: "你来到了远古山脉，寻找星象线索...",
+            animation: "⛰️",
+            quiz: null
           },
-          { 
-            title: "观察星象", 
-            content: "在山顶观察星象，寻找宝藏的最终位置...", 
-            animation: "🔭", 
+          {
+            title: "观察星象",
+            content: "在山顶观察星象，寻找宝藏的最终位置...",
+            animation: "🔭",
             quiz: {
               question: "哪颗星星指向宝藏位置？",
               options: [
@@ -245,16 +249,16 @@ export default {
         title: "宝藏密室",
         subtitle: "打开宝藏箱",
         steps: [
-          { 
-            title: "进入密室", 
-            content: "你终于来到了宝藏密室，找到了神秘的宝藏箱...", 
-            animation: "💎", 
-            quiz: null 
+          {
+            title: "进入密室",
+            content: "你终于来到了宝藏密室，找到了神秘的宝藏箱...",
+            animation: "💎",
+            quiz: null
           },
-          { 
-            title: "打开宝箱", 
-            content: "宝藏箱上有最后的谜题，需要解开才能打开...", 
-            animation: "🎁", 
+          {
+            title: "打开宝箱",
+            content: "宝藏箱上有最后的谜题，需要解开才能打开...",
+            animation: "🎁",
             quiz: {
               question: "宝藏箱上的谜题：什么东西越洗越脏？",
               options: [
@@ -271,17 +275,19 @@ export default {
       }
     }
     
-    // 计算属性
+    // 计算属性 - 添加null检查
     const currentLocationData = computed(() => {
-      return locationsConfig[route.params.id] || null
+      const locationId = route.params.id
+      return locationsConfig[locationId] || null
     })
     
     const isCompleted = computed(() => {
-      return gameStore.completedLocations.includes(route.params.id)
+      const locationId = route.params.id
+      return gameStore.completedLocations.includes(locationId)
     })
     
     const stepProgress = computed(() => {
-      if (!currentLocationData.value) return 0
+      if (!currentLocationData.value || !currentLocationData.value.steps) return 0
       return ((currentStepIndex.value + 1) / currentLocationData.value.steps.length) * 100
     })
     
@@ -291,11 +297,16 @@ export default {
       return '开始任务'
     })
     
-    // 方法
+    // 方法 - 添加错误处理
     const startLocationGame = () => {
-      if (isCompleted.value || isInProgress.value) return
+      if (isCompleted.value || isInProgress.value || !currentLocationData.value) return
       
-      gameStore.playSound('click')
+      try {
+        gameStore.playSound('click')
+      } catch (e) {
+        console.warn('Sound play failed:', e)
+      }
+      
       isInProgress.value = true
       currentStepIndex.value = 0
       resultMessage.value = "任务进行中..."
@@ -307,7 +318,7 @@ export default {
     }
     
     const proceedToNextStep = () => {
-      if (!currentLocationData.value) return
+      if (!currentLocationData.value || !currentLocationData.value.steps) return
       
       const currentStep = currentLocationData.value.steps[currentStepIndex.value]
       
@@ -327,13 +338,22 @@ export default {
     const handleAnswer = (optionIndex, isCorrect) => {
       if (showAnswer.value) return
       
-      gameStore.playSound('click')
+      try {
+        gameStore.playSound('click')
+      } catch (e) {
+        console.warn('Sound play failed:', e)
+      }
+      
       showAnswer.value = true
       selectedOption.value = optionIndex
       
       setTimeout(() => {
         if (isCorrect) {
-          gameStore.playSound('success')
+          try {
+            gameStore.playSound('success')
+          } catch (e) {
+            console.warn('Sound play failed:', e)
+          }
           currentStepIndex.value++
           if (currentStepIndex.value < currentLocationData.value.steps.length) {
             showAnswer.value = false
@@ -343,39 +363,53 @@ export default {
             completeLocation()
           }
         } else {
-          gameStore.playSound('failure')
+          try {
+            gameStore.playSound('failure')
+          } catch (e) {
+            console.warn('Sound play failed:', e)
+          }
           failLocation()
         }
       }, 1200)
     }
     
     const completeLocation = () => {
-      gameStore.completeLocation(route.params.id)
+      const locationId = route.params.id
+      gameStore.completeLocation(locationId)
       resultMessage.value = currentLocationData.value.resultSuccess
       isInProgress.value = false
     }
     
     const failLocation = () => {
-      gameStore.failLocation(route.params.id)
+      const locationId = route.params.id
+      gameStore.failLocation(locationId)
       resultMessage.value = currentLocationData.value.resultFailure
       isInProgress.value = false
     }
     
     const goBack = () => {
-      gameStore.playSound('click')
+      try {
+        gameStore.playSound('click')
+      } catch (e) {
+        console.warn('Sound play failed:', e)
+      }
       router.push('/')
     }
     
     // 生命周期
     onMounted(() => {
       if (!currentLocationData.value) {
-        router.push('/')
+        console.warn('Location not found:', route.params.id)
         return
       }
       
       // 播放地点背景音乐
       if (gameStore.locationBgmEnabled) {
-        gameStore.playLocationBgm(route.params.id)
+        try {
+          gameStore.playLocationBgm(route.params.id)
+        } catch (e) {
+          console.warn('BGM play failed:', e)
+        }
       }
       
       // 如果地点已完成，显示成功信息
@@ -386,7 +420,11 @@ export default {
     
     onUnmounted(() => {
       // 停止地点音乐，返回全景时会自动播放全景音乐
-      gameStore.stopBgm()
+      try {
+        gameStore.stopBgm()
+      } catch (e) {
+        console.warn('BGM stop failed:', e)
+      }
     })
     
     return {
@@ -408,14 +446,41 @@ export default {
 }
 </script>
 
-<!-- 样式保持不变 -->
-
 <style scoped>
 .location-view {
   background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
   color: #fff;
   min-height: 100vh;
   padding: 15px;
+}
+
+.loading {
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  gap: 20px;
+}
+
+.back-btn {
+  background: #ffcc00;
+  color: #000;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  background: #ffd700;
+  transform: translateY(-2px);
 }
 
 .container {
@@ -676,27 +741,27 @@ footer {
   .container {
     padding: 10px;
   }
-  
+
   h1 {
     font-size: 1.8rem;
   }
-  
+
   .game-area {
     max-height: 350px;
   }
-  
+
   .step-card {
     padding: 10px;
   }
-  
+
   .quiz-options {
     grid-template-columns: 1fr;
   }
-  
+
   .controls {
     flex-direction: column;
   }
-  
+
   .audio-controls {
     flex-direction: column;
     gap: 10px;

@@ -7,8 +7,8 @@
       </header>
       
       <div class="panorama-map">
-        <div 
-          v-for="location in locations" 
+        <div
+          v-for="location in locations"
           :key="location.id"
           class="location"
           :class="{
@@ -31,17 +31,17 @@
         探索进度: {{ completedCount }}/{{ totalLocations }} 个地点
       </div>
       
-       <div class="audio-controls">
-  <button class="audio-btn" :class="{ active: gameStore.bgmEnabled }" @click="handleAudioButtonClick(gameStore.toggleBgm)">
-    {{ gameStore.bgmEnabled ? '🔊' : '🔇' }} 背景音乐
-  </button>
-  <button class="audio-btn" :class="{ active: gameStore.soundEffectsEnabled }" @click="handleAudioButtonClick(gameStore.toggleSoundEffects)">
-    {{ gameStore.soundEffectsEnabled ? '🔊' : '🔇' }} 音效
-  </button>
-  <button class="audio-btn reset-btn" @click="resetGame">
-    🔄 重新开始
-  </button>
-</div>
+      <div class="audio-controls">
+        <button class="audio-btn" :class="{ active: gameStore.bgmEnabled }" @click="handleAudioButtonClick(gameStore.toggleBgm)">
+          {{ gameStore.bgmEnabled ? '🔊' : '🔇' }} 背景音乐
+        </button>
+        <button class="audio-btn" :class="{ active: gameStore.soundEffectsEnabled }" @click="handleAudioButtonClick(gameStore.toggleSoundEffects)">
+          {{ gameStore.soundEffectsEnabled ? '🔊' : '🔇' }} 音效
+        </button>
+        <button class="audio-btn reset-btn" @click="resetGame">
+          🔄 重新开始
+        </button>
+      </div>
       
       <footer>
         多地点寻宝游戏 - 使用 localStorage 保存进度
@@ -130,6 +130,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
 .panorama-view {
   background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
@@ -301,15 +302,15 @@ footer {
   .container {
     padding: 10px;
   }
-  
+
   h1 {
     font-size: 1.8rem;
   }
-  
+
   .panorama-map {
     grid-template-columns: 1fr;
   }
-  
+
   .audio-controls {
     flex-direction: column;
     gap: 10px;
