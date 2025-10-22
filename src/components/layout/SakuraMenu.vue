@@ -7,18 +7,33 @@
       <div class="nav-links">
         <router-link to="/">地图</router-link>
         <router-link to="/ranking">排行榜</router-link>
-        <router-link to="/login">登录</router-link>
+        
+        <!-- 根据登录状态显示不同菜单 -->
+        <router-link v-if="authStore.isLoggedIn" to="/users">
+          👤 {{ authStore.user.username }}
+        </router-link>
+        <router-link v-else to="/login">登录</router-link>
       </div>
     </div>
   </nav>
 </template>
 
 <script>
+import { useAuthStore } from '../../store'
+
 export default {
-  name: 'SakuraMenu'
+  name: 'SakuraMenu',
+  setup() {
+    const authStore = useAuthStore()
+    
+    return {
+      authStore
+    }
+  }
 }
 </script>
 
+<!-- 样式保持不变 -->
 <style scoped>
 .sakura-menu {
   background: rgba(0, 0, 0, 0.8);

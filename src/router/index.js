@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../store'
 
 const routes = [
   {
@@ -20,14 +21,15 @@ const routes = [
   {
     path: '/users',
     name: 'Users',
-    component: () => import('../views/UserManagement.vue')
+    component: () => import('../views/UserManagement.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue')
+    component: () => import('../views/Login.vue'),
+    meta: { requiresGuest: true }
   },
-  // 添加通配路由处理未知路径
   {
     path: '/:pathMatch(.*)*',
     redirect: '/'
@@ -37,6 +39,25 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  
+  // 检查是否需要认证
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    next('/login')
+    return
+  }
+  
+  // 检查是否要求未登录（如登录页面）
+  if (to.meta.requiresGuest && authStore.isLoggedIn) {
+    next('/users')
+    return
+  }
+  
+  next()
 })
 
 export default router

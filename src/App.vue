@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import { onMounted } from 'vue'
+import { useAuthStore } from './store'
 import SakuraMenu from './components/layout/SakuraMenu.vue'
 import Footer from './components/layout/Footer.vue'
 
@@ -17,9 +19,19 @@ export default {
   components: {
     SakuraMenu,
     Footer
+  },
+  setup() {
+    const authStore = useAuthStore()
+    
+    onMounted(() => {
+      // 初始化时检查认证状态
+      authStore.checkAuthStatus()
+    })
   }
 }
 </script>
+
+<!-- 样式保持不变 -->
 
 <style>
 * {

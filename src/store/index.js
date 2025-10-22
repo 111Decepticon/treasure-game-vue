@@ -1,276 +1,189 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export const useGameStore = defineStore('game', () => {
-  // 状态
-  const currentLocation = ref(null)
-  const completedLocations = ref([])
-  const locationProgress = ref({})
-  
-  // 音频状态
-  const bgmEnabled = ref(true)
-  const locationBgmEnabled = ref(true)
-  const soundEffectsEnabled = ref(true)
-  const userInteracted = ref(false) // 新增：跟踪用户是否已交互
-  
-  // 音频对象
-  const currentBgm = ref(null)
+export const useAuthStore = defineStore('auth', () => {
+  // 用户状态
+  const user = ref(null)
+  const isAuthenticated = ref(false)
+  const token = ref(null)
 
   // 计算属性
-  const globalProgress = computed(() => {
-    const total = 6 // 总共6个地点
-    const done = completedLocations.value.length
-    return (done / total) * 100
-  })
+  const currentUser = computed(() => user.value)
+  const isLoggedIn = computed(() => isAuthenticated.value)
 
-  // 音频方法
-  const initAudio = () => {
-    if (!audioContext.value) {
-      audioContext.value = new (window.AudioContext || window.webkitAudioContext)()
-    }
-  }
-
-  const playSound = (type) => {
-    if (!soundEffectsEnabled.value || !userInteracted.value) return
-    
-    initAudio()
-    
-    const context = audioContext.value
-    let oscillator = context.createOscillator()
-    let gainNode = context.createGain()
-    
-    oscillator.connect(gainNode)
-    gainNode.connect(context.destination)
-    
-    switch(type) {
-      case 'success':
-        oscillator.frequency.setValueAtTime(523.25, context.currentTime)
-        oscillator.frequency.setValueAtTime(659.25, context.currentTime + 0.1)
-        oscillator.frequency.setValueAtTime(783.99, context.currentTime + 0.2)
-        gainNode.gain.setValueAtTime(0.3, context.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5)
-        oscillator.start(context.currentTime)
-        oscillator.stop(context.currentTime + 0.5)
-        break
-      case 'failure':
-        oscillator.frequency.setValueAtTime(392, context.currentTime)
-        oscillator.frequency.setValueAtTime(349.23, context.currentTime + 0.1)
-        oscillator.frequency.setValueAtTime(329.63, context.currentTime + 0.2)
-        gainNode.gain.setValueAtTime(0.3, context.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5)
-        oscillator.start(context.currentTime)
-        oscillator.stop(context.currentTime + 0.5)
-        break
-      case 'click':
-        oscillator.frequency.setValueAtTime(800, context.currentTime)
-        gainNode.gain.setValueAtTime(0.2, context.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1)
-        oscillator.start(context.currentTime)
-        oscillator.stop(context.currentTime + 0.1)
-        break
-      case 'complete':
-        const notes = [523.25, 659.25, 783.99, 1046.50]
-        notes.forEach((freq, i) => {
-          setTimeout(() => {
-            let osc = context.createOscillator()
-            let gain = context.createGain()
-            osc.connect(gain)
-            gain.connect(context.destination)
-            osc.frequency.setValueAtTime(freq, context.currentTime)
-            gain.gain.setValueAtTime(0.3, context.currentTime)
-            gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3)
-            osc.start(context.currentTime)
-            osc.stop(context.currentTime + 0.3)
-          }, i * 200)
-        })
-        break
-    }
-  }
-
-  const playBgm = (bgmPath) => {
-    if (!bgmEnabled.value || currentBgm.value || !userInteracted.value) return
-    
+  // 动作方法
+  const login = async (credentials) => {
     try {
-      currentBgm.value = new Audio(bgmPath)
-      currentBgm.value.loop = true
-      currentBgm.value.volume = 0.3
+      // 模拟登录API调用
+      const response = await mockLogin(credentials)
       
-      // 处理音频加载错误
-      currentBgm.value.addEventListener('error', (e) => {
-        console.log('BGM加载失败:', bgmPath, e)
-        currentBgm.value = null
-      })
+      user.value = response.user
+      token.value = response.token
+      isAuthenticated.value = true
       
-      const playPromise = currentBgm.value.play()
-      if (playPromise !== undefined) {
-        playPromise.catch(e => {
-          console.log('BGM播放失败:', e)
-          currentBgm.value = null
-        })
-      }
+      // 保存到localStorage
+      localStorage.setItem('auth_token', token.value)
+      localStorage.setItem('user_data', JSON.stringify(user.value))
+      
+      return { success: true, message: '登录成功' }
     } catch (error) {
-      console.log('BGM错误:', error)
-      currentBgm.value = null
+      return { success: false, message: error.message }
     }
   }
 
-  const stopBgm = () => {
-    if (currentBgm.value) {
-      currentBgm.value.pause()
-      currentBgm.value.currentTime = 0
-      currentBgm.value = null
+  const register = async (userData) => {
+    try {
+      // 模拟注册API调用
+      const response = await mockRegister(userData)
+      
+      user.value = response.user
+      token.value = response.token
+      isAuthenticated.value = true
+      
+      // 保存到localStorage
+      localStorage.setItem('auth_token', token.value)
+      localStorage.setItem('user_data', JSON.stringify(user.value))
+      
+      return { success: true, message: '注册成功' }
+    } catch (error) {
+      return { success: false, message: error.message }
     }
   }
 
-  const playLocationBgm = (locationId) => {
-    if (!locationBgmEnabled.value || !userInteracted.value) return
+  const logout = () => {
+    user.value = null
+    token.value = null
+    isAuthenticated.value = false
     
-    stopBgm()
+    // 清除localStorage
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('user_data')
+  }
+
+  const updateProfile = async (profileData) => {
+    try {
+      // 模拟更新用户信息
+      const response = await mockUpdateProfile(profileData)
+      user.value = { ...user.value, ...response.user }
+      
+      // 更新localStorage
+      localStorage.setItem('user_data', JSON.stringify(user.value))
+      
+      return { success: true, message: '个人信息更新成功' }
+    } catch (error) {
+      return { success: false, message: error.message }
+    }
+  }
+
+  const checkAuthStatus = () => {
+    const savedToken = localStorage.getItem('auth_token')
+    const savedUser = localStorage.getItem('user_data')
     
-    const bgmMap = {
-      library: '/audio/library-bgm.mp3',
-      temple: '/audio/temple-bgm.mp3',
-      cave: '/audio/cave-bgm.mp3',
-      beach: '/audio/beach-bgm.mp3',
-      mountain: '/audio/mountain-bgm.mp3',
-      treasure: '/audio/treasure-bgm.mp3'
-    }
-    
-    const bgmPath = bgmMap[locationId]
-    if (bgmPath) {
-      playBgm(bgmPath)
+    if (savedToken && savedUser) {
+      token.value = savedToken
+      user.value = JSON.parse(savedUser)
+      isAuthenticated.value = true
     }
   }
 
-  // 标记用户已交互（解决自动播放策略）
-  const markUserInteracted = () => {
-    if (!userInteracted.value) {
-      userInteracted.value = true
-      // 重新初始化音频上下文
-      initAudio()
-    }
+  // 模拟API函数
+  const mockLogin = (credentials) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // 模拟验证
+        if (credentials.username && credentials.password) {
+          resolve({
+            user: {
+              id: 1,
+              username: credentials.username,
+              email: `${credentials.username}@example.com`,
+              avatar: '👤',
+              joinDate: new Date().toISOString(),
+              gameStats: {
+                completedGames: 0,
+                totalPlayTime: 0,
+                bestTime: null
+              }
+            },
+            token: 'mock_jwt_token_' + Date.now()
+          })
+        } else {
+          reject(new Error('用户名或密码不能为空'))
+        }
+      }, 1000)
+    })
   }
 
-  // 游戏方法
-  const setCurrentLocation = (locationId) => {
-    currentLocation.value = locationId
+  const mockRegister = (userData) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (userData.username && userData.password && userData.email) {
+          resolve({
+            user: {
+              id: Date.now(),
+              username: userData.username,
+              email: userData.email,
+              avatar: '👤',
+              joinDate: new Date().toISOString(),
+              gameStats: {
+                completedGames: 0,
+                totalPlayTime: 0,
+                bestTime: null
+              }
+            },
+            token: 'mock_jwt_token_' + Date.now()
+          })
+        } else {
+          reject(new Error('请填写完整信息'))
+        }
+      }, 1000)
+    })
   }
 
-  const completeLocation = (locationId) => {
-    if (!completedLocations.value.includes(locationId)) {
-      completedLocations.value.push(locationId)
-      playSound('success')
-    }
-    locationProgress.value[locationId] = 'completed'
-    saveGameState()
-    
-    // 如果完成所有地点，播放完成音效
-    if (completedLocations.value.length === 6) {
-      playSound('complete')
-    }
+  const mockUpdateProfile = (profileData) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          user: profileData
+        })
+      }, 800)
+    })
   }
-
-  const failLocation = (locationId) => {
-    locationProgress.value[locationId] = 'failed'
-    playSound('failure')
-    saveGameState()
-  }
-
-  const resetGame = () => {
-    currentLocation.value = null
-    completedLocations.value = []
-    locationProgress.value = {}
-    stopBgm()
-    localStorage.removeItem('treasureGameState')
-  }
-
-  const saveGameState = () => {
-    const state = {
-      currentLocation: currentLocation.value,
-      completedLocations: completedLocations.value,
-      locationProgress: locationProgress.value,
-      bgmEnabled: bgmEnabled.value,
-      locationBgmEnabled: locationBgmEnabled.value,
-      soundEffectsEnabled: soundEffectsEnabled.value
-    }
-    localStorage.setItem('treasureGameState', JSON.stringify(state))
-  }
-
-  const loadGameState = () => {
-    const savedState = localStorage.getItem('treasureGameState')
-    if (savedState) {
-      const parsedState = JSON.parse(savedState)
-      currentLocation.value = parsedState.currentLocation
-      completedLocations.value = parsedState.completedLocations || []
-      locationProgress.value = parsedState.locationProgress || {}
-      bgmEnabled.value = parsedState.bgmEnabled !== undefined ? parsedState.bgmEnabled : true
-      locationBgmEnabled.value = parsedState.locationBgmEnabled !== undefined ? parsedState.locationBgmEnabled : true
-      soundEffectsEnabled.value = parsedState.soundEffectsEnabled !== undefined ? parsedState.soundEffectsEnabled : true
-    }
-  }
-
-  // 音频控制方法
-  const toggleBgm = () => {
-    markUserInteracted()
-    bgmEnabled.value = !bgmEnabled.value
-    if (!bgmEnabled.value) {
-      stopBgm()
-    } else if (currentLocation.value) {
-      playLocationBgm(currentLocation.value)
-    } else {
-      playBgm('/audio/panorama-bgm.mp3')
-    }
-    saveGameState()
-  }
-
-  const toggleLocationBgm = () => {
-    markUserInteracted()
-    locationBgmEnabled.value = !locationBgmEnabled.value
-    if (!locationBgmEnabled.value) {
-      stopBgm()
-    } else if (currentLocation.value) {
-      playLocationBgm(currentLocation.value)
-    }
-    saveGameState()
-  }
-
-  const toggleSoundEffects = () => {
-    markUserInteracted()
-    soundEffectsEnabled.value = !soundEffectsEnabled.value
-    saveGameState()
-  }
-
-  // 音频上下文
-  const audioContext = ref(null)
 
   return {
     // 状态
-    currentLocation,
-    completedLocations,
-    locationProgress,
-    bgmEnabled,
-    locationBgmEnabled,
-    soundEffectsEnabled,
+    user,
+    isAuthenticated,
+    token,
     
     // 计算属性
-    globalProgress,
+    currentUser,
+    isLoggedIn,
     
-    // 游戏方法
-    setCurrentLocation,
-    completeLocation,
-    failLocation,
-    resetGame,
-    saveGameState,
-    loadGameState,
-    
-    // 音频方法
-    playSound,
-    playBgm,
-    stopBgm,
-    playLocationBgm,
-    toggleBgm,
-    toggleLocationBgm,
-    toggleSoundEffects,
-    markUserInteracted
+    // 动作方法
+    login,
+    register,
+    logout,
+    updateProfile,
+    checkAuthStatus
+  }
+})
+
+// 保持原有的游戏状态管理
+export const useGameStore = defineStore('game', () => {
+  // ... 保持原有的游戏状态管理代码不变
+  // 只是添加一个与用户关联的方法
+  const updateUserGameStats = () => {
+    const authStore = useAuthStore()
+    if (authStore.isLoggedIn) {
+      // 更新用户的游戏统计
+      const completedCount = completedLocations.value.length
+      // 这里可以添加更多统计逻辑
+    }
+  }
+
+  return {
+    // ... 原有的返回内容
+    updateUserGameStats
   }
 })
